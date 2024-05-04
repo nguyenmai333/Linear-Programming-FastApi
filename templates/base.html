@@ -10,27 +10,51 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            background-color: #f0f0f0;
+            background-color: #defdff;
         }
         h2 {
             text-align: center;
         }
+        .container{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+        }
         .calculator-container {
-            max-width: 400px;
-            margin: 0 auto;
+            width: 400px;
+            height: 270px;
             background-color: #fff;
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 20px;
+            margin: 20px;
+        }
+        .expression-container {
+            display: flex;
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 450px;
+            min-height: 45px;
+            margin: 20px;
+            flex-direction: column;
         }
         .calculator-input {
-            width: 100%;
+            outline: none;
+            width: 300px;
+            margin: 20px;
+            height: 40px;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
         }
+        .selected {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
+        }
+
         .operation-btn, .number-btn {
             padding: 10px;
             margin: 5px;
@@ -47,7 +71,7 @@
         }
         .sub-calculator-container {
             display: flex;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .sub-sub-calculator-container {
             padding: 2px;
@@ -58,53 +82,140 @@
             justify-items: center;
             flex-direction: column;
         }
+        .util-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            min-width: 40px;
+            min-height: 40px;
+            margin-right: 20px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+
+        .btn-container {
+            display: flex;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-    <h2>Calculator</h2>
-    <div class="calculator-container">
-        <input type="text" id="expression" name="expression" class="calculator-input" placeholder="Enter expression (e.g., x + 1 < 5)" required>
-        <div class="sub-calculator-container">
-            <div class="sub-sub-calculator-container">
-                <div class="btn-group">
-                    <button class="operation-btn" type="button" onclick="addCharacter('+')">+</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('-')">-</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('*')">*</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('/')">/</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('(')">(</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter(')')">)</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('<')">&lt;</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('>')">&gt;</button>
-                    <button class="operation-btn" type="button" onclick="addCharacter('=')">=</button>
+    <h2>Linear Programming Calculator</h2>
+    <div class="container">
+        <div class="calculator-container">
+            <div class="sub-calculator-container">
+                <div class="sub-sub-calculator-container">
+                    <div class="btn-group">
+                        <button class="operation-btn" type="button" onclick="addCharacter('+')">+</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('-')">-</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('*')">*</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('/')">/</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('(')">(</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter(')')">)</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('<')">&lt;</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('>')">&gt;</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('=')">=</button>
+                    </div>
+                </div>
+                <div class="sub-sub-calculator-container">
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('1')">1</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('2')">2</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('3')">3</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('4')">4</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('5')">5</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('6')">6</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('7')">7</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('8')">8</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('9')">9</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('0')">0</button>
+                    </div>
                 </div>
             </div>
-            <div class="sub-sub-calculator-container">
-                <div class="btn-group">
-                    <button class="number-btn" type="button" onclick="addCharacter('1')">1</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('2')">2</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('3')">3</button>
-                </div>
-                <div class="btn-group">
-                    <button class="number-btn" type="button" onclick="addCharacter('4')">4</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('5')">5</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('6')">6</button>
-                </div>
-                <div class="btn-group">
-                    <button class="number-btn" type="button" onclick="addCharacter('7')">7</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('8')">8</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('9')">9</button>
-                </div>
-                <div class="btn-group">
-                    <button class="number-btn" type="button" onclick="addCharacter('0')">0</button>
+            <div class="sub-calculator-container" style=" background: white;">
+                <div class="btn-group" style="display: flex;">
+                    <button class="number-btn" type="button" onclick="addCharacter('x')">x</button>
+                    <button class="number-btn" type="button" onclick="addCharacter('y')">y</button>
+                    <button class="number-btn" type="button" onclick="addCharacter('z')">z</button>
+                    <button class="number-btn" type="button" onclick="addCharacter('t')">t</button>
                 </div>
             </div>
-       </div>
-        <input type="submit" value="Calculate" class="operation-btn" onclick="confirmExpression()" style="width: 100%;">
+        </div>
+        <div class="expression-container">
+            <div class="btn-container">
+                <label style="margin-right: 10px;">Problem:</label>
+                <select id="problemSolver" style="border: 1px solid rgb(139, 139, 139); border-radius: 4px; outline: none;">
+                    <option value="min">Minimize</option>
+                    <option value="max">Maximize</option>
+                </select>
+            </div>
+            <input type="text" id="expression" name="expression" class="calculator-input" onClick="handleClick(this)" placeholder="Enter expression (e.g., x + 1 < 5)" autocomplete="off" required >
+            <div class="btn-container">
+                <button class="util-btn" onclick="AddInputTag()">+</button>
+                <button class="util-btn" onclick="DeleteInputTag()">-</button>
+                <button class="util-btn" id = "submit" value="Calculate" class="operation-btn" onclick="confirmExpression()" style="width: 100%;">Calculate</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        var selectedElement = null;
+        function AddInputTag() {
+            var container = document.querySelector('.expression-container');
+            var newInput = document.createElement("input");
+            newInput.type = "text";
+            newInput.className = "calculator-input";
+            newInput.placeholder = "Enter expression (e.g., x + 1 < 5)";
+            newInput.required = true;
+            newInput.id = "expression";
+            newInput.setAttribute("onclick","handleClick(this)");
+            newInput.autocomplete = "off";
+            if (!document.getElementById('expression')) {
+                container.insertBefore(newInput, container.firstChild);
+                return;
+            }
+            var currentInput = container.querySelector('input');
+            container.insertBefore(newInput, currentInput.nextSibling);
+            return;
+        }
+        function DeleteInputTag() {
+            if (!document.getElementById('expression')) {
+                alert("There is no input field to delete.");
+                return;
+            }
+            var container = document.querySelector('.expression-container');
+            var currentInput = container.querySelector('input');
+            container.removeChild(currentInput);
+        }
+
+        function handleClick(element) {
+            // Đặt lại lớp cho tất cả các phần tử có lớp là 'calculator-input'
+            var inputs = document.querySelectorAll('.calculator-input');
+            inputs.forEach(function(input) {
+                input.classList.remove('selected');
+            });
+
+            // Thêm lớp 'selected' cho phần tử được chọn
+            element.classList.add('selected');
+            this.selectedElement = element
+        }
+
         function addCharacter(character) {
-            document.getElementById("expression").value += character;
+            if (selectedElement) {
+                var currentValue = selectedElement.value || "";
+                selectedElement.value = currentValue + character;
+            } else {
+                alert("Please select an element first.");
+            }
         }
 
         function confirmExpression() {
