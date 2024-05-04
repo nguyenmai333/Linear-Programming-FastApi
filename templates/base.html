@@ -143,10 +143,12 @@
             </div>
             <div class="sub-calculator-container" style=" background: white;">
                 <div class="btn-group" style="display: flex;">
-                    <button class="number-btn" type="button" onclick="addCharacter('x')">x</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('y')">y</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('z')">z</button>
-                    <button class="number-btn" type="button" onclick="addCharacter('t')">t</button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_1')">x<sub>1</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_2')">x<sub>2</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_3')">x<sub>3</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_4')">x<sub>4</sub></button>
+                    <button class="number-btn" type="button" onclick="listen_user()">x<sub>...</sub></button>
+
                 </div>
             </div>
         </div>
@@ -158,6 +160,7 @@
                     <option value="max">Maximize</option>
                 </select>
             </div>
+            <label id = 'subject' style="margin-left: 20px;">Subject To:</label>
             <input type="text" id="expression" name="expression" class="calculator-input" onClick="handleClick(this)" placeholder="Enter expression (e.g., x + 1 < 5)" autocomplete="off" required >
             <div class="btn-container">
                 <button class="util-btn" onclick="AddInputTag()">+</button>
@@ -169,6 +172,21 @@
 
     <script>
         var selectedElement = null;
+        function listen_user() {
+            var number = prompt("Please enter a number:");
+            if (number !== null) {
+                var parsedNumber = parseFloat(number);
+                if (!isNaN(parsedNumber)) {
+                    console.log("The user entered: " + parsedNumber);
+                } else {
+                    console.log("Invalid input. Please enter a valid number.");
+                }
+            } else {
+                console.log("User canceled the prompt.");
+            }
+            addCharacter('x_'+number)
+        }
+
         function AddInputTag() {
             var container = document.querySelector('.expression-container');
             var newInput = document.createElement("input");
@@ -180,7 +198,7 @@
             newInput.setAttribute("onclick","handleClick(this)");
             newInput.autocomplete = "off";
             if (!document.getElementById('expression')) {
-                container.insertBefore(newInput, container.firstChild);
+                container.insertBefore(newInput, document.getElementById('subject').nextSibling);
                 return;
             }
             var currentInput = container.querySelector('input');
