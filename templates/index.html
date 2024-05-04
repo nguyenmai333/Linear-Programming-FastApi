@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Linear Programming Calculator</h2>
+    <div class="container">
+        <div class="calculator-container">
+            <div class="sub-calculator-container">
+                <div class="sub-sub-calculator-container">
+                    <div class="btn-group">
+                        <button class="operation-btn" type="button" onclick="addCharacter('+')">+</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('-')">-</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('*')">*</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('/')">/</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('(')">(</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter(')')">)</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('<')">&lt;</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('>')">&gt;</button>
+                        <button class="operation-btn" type="button" onclick="addCharacter('=')">=</button>
+                    </div>
+                </div>
+                <div class="sub-sub-calculator-container">
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('1')">1</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('2')">2</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('3')">3</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('4')">4</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('5')">5</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('6')">6</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('7')">7</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('8')">8</button>
+                        <button class="number-btn" type="button" onclick="addCharacter('9')">9</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="number-btn" type="button" onclick="addCharacter('0')">0</button>
+                    </div>
+                </div>
+            </div>
+            <div class="sub-calculator-container" style=" background: white;">
+                <div class="btn-group" style="display: flex;">
+                    <button class="number-btn" type="button" onclick="addCharacter('x_1')">x<sub>1</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_2')">x<sub>2</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_3')">x<sub>3</sub></button>
+                    <button class="number-btn" type="button" onclick="addCharacter('x_4')">x<sub>4</sub></button>
+                    <button class="number-btn" type="button" onclick="listen_user()">x<sub>...</sub></button>
+
+                </div>
+            </div>
+        </div>
+        <div class="expression-container">
+            <div class="btn-container">
+                <label style="margin-right: 10px;">Problem:</label>
+                <select id="problemSolver" style="border: 1px solid rgb(139, 139, 139); border-radius: 4px; outline: none;">
+                    <option value="min">Minimize</option>
+                    <option value="max">Maximize</option>
+                </select>
+            </div>
+            <label id = 'subject' style="margin-left: 20px;">Subject To:</label>
+            <input type="text" id="expression" name="expression" class="calculator-input" onClick="handleClick(this)" placeholder="Enter expression (e.g., x + 1 < 5)" autocomplete="off" required >
+            <div class="btn-container">
+                <button class="util-btn" onclick="AddInputTag()">+</button>
+                <button class="util-btn" onclick="DeleteInputTag()">-</button>
+                <button class="util-btn" id = "submit" value="Calculate" class="operation-btn" onclick="confirmExpression()" style="width: 100%;">Calculate</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
