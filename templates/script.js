@@ -62,14 +62,6 @@ function addCharacter(character) {
     }
 }
 
-function test() {
-    
-    var expression = document.querySelectorAll("#expression");
-    var problem_expression = document.getElementById("problem-expression");
-    console.log(expression);
-    console.log(problem_expression.value)
-}
-
 function confirmExpression() {
     var expression = document.querySelectorAll("#expression");
     var problem_expression = document.getElementById("problem-expression");
