@@ -29,7 +29,7 @@ function AddInputTag() {
         container.insertBefore(newInput, document.getElementById('subject').nextSibling);
         return;
     }
-    var currentInput = container.querySelector('input');
+    var currentInput = container.querySelector('#expression');
     container.insertBefore(newInput, currentInput.nextSibling);
     return;
 }
@@ -39,18 +39,16 @@ function DeleteInputTag() {
         return;
     }
     var container = document.querySelector('.expression-container');
-    var currentInput = container.querySelector('input');
+    var currentInput = container.querySelector('#expression');
     container.removeChild(currentInput);
 }
 
 function handleClick(element) {
-    // Đặt lại lớp cho tất cả các phần tử có lớp là 'calculator-input'
     var inputs = document.querySelectorAll('.calculator-input');
     inputs.forEach(function(input) {
         input.classList.remove('selected');
     });
 
-    // Thêm lớp 'selected' cho phần tử được chọn
     element.classList.add('selected');
     this.selectedElement = element
 }
@@ -64,12 +62,37 @@ function addCharacter(character) {
     }
 }
 
+function test() {
+    
+    var expression = document.querySelectorAll("#expression");
+    var problem_expression = document.getElementById("problem-expression");
+    console.log(expression);
+    console.log(problem_expression.value)
+}
+
 function confirmExpression() {
-    var expression = document.getElementById("expression").value;
-    if (expression.trim() === "") {
-        alert("Please enter an expression.");
+    var expression = document.querySelectorAll("#expression");
+    var problem_expression = document.getElementById("problem-expression");
+
+    function areAllInputsEmpty(inputs) {
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].value.trim() === "") {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (problem_expression.value.trim() === "") {
+        alert("Please enter an Problem Expression.");
         return false;
     }
+    
+    if (!areAllInputsEmpty(expression)) {
+        alert("Please enter an Expression.");
+        return false;
+    }
+
     fetch('/validate/', {
         method: 'POST',
         headers: {
@@ -80,6 +103,11 @@ function confirmExpression() {
     .then(response => response.json())
     .then(data => {
         if (data.is_valid) {
+        ///
+
+            var problem = document.getElementById("#problem-expression").value
+
+        ///
         } else {
             alert("Invalid expression.");
         }
