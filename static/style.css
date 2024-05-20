@@ -9,9 +9,13 @@ body {
 h2 {
     text-align: center;
 }
+.math-operators {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-line; /* Giữ nguyên định dạng xuống dòng */
+}
 .container{
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
 }
@@ -93,4 +97,12 @@ h2 {
 .btn-container {
     display: flex;
     padding: 20px;
+}
+
+.btn-container:first-child {
+    padding-bottom: 0px;
+}
+
+#problem-expression {   
+    margin-top: 10px;
 }
