@@ -1,5 +1,10 @@
 from itertools import combinations
-from read_json import from_json
+
+def from_json(json_data):
+    objective = json_data["objective"]
+    constraints = json_data["constraints"]
+    return objective, constraints
+
 
 class LinearProgrammingBasicSolver:
     def __init__(self, json_data):
@@ -68,7 +73,7 @@ class LinearProgrammingBasicSolver:
         for id_ in reversed(to_remove):
             self.points.pop(id_)
 
-        if points == []:
+        if self.points == []:
             print("bài toán vô nghiệm:")
 
     def find_optimal_value(self):
@@ -87,51 +92,53 @@ class LinearProgrammingBasicSolver:
                 recall_max = point
 
         if self.objective['type'] == 'max':
-            print(f'Giá trị tối ưu: {max_val} | Nghiệm tối ưu: {recall_max}')
+            self.results['var'] = max_val
+            self.results['val'] = recall_max
         else:
-            print(f'Giá trị tối ưu: {min_val} | Nghiệm tối ưu: {recall_min}')
+            self.results['var'] = min_val
+            self.results['val'] = recall_min
 
-# Sử dụng class
-json_data = {
-    "objective": {
-        "type": "max",
-        "coefficients": [1, 1]
-    },
-    "constraints": [
-        {
-            "name": "constraint1",
-            "coefficients": [1, 2],
-            "relation": "<=",
-            "rhs": 6
-        },
-        {
-            "name": "constraint2",
-            "coefficients": [2, 1],
-            "relation": "<=",
-            "rhs": 8
-        },
-        {
-            "name": "constraint3",
-            "coefficients": [0, 1],
-            "relation": "<=",
-            "rhs": 2
-        },
-        {
-            "name": "constraint4",
-            "coefficients": [1, 0],
-            "relation": ">=",
-            "rhs": 0
-        }, 
-        {
-            "name": "constraint3",
-            "coefficients": [0, 1],
-            "relation": ">=",
-            "rhs": 0
-        }
-    ]
-}
+# # Sử dụng class
+# json_data = {
+#     "objective": {
+#         "type": "max",
+#         "coefficients": [1, 1]
+#     },
+#     "constraints": [
+#         {
+#             "name": "constraint1",
+#             "coefficients": [1, 2],
+#             "relation": "<=",
+#             "rhs": 6
+#         },
+#         {
+#             "name": "constraint2",
+#             "coefficients": [2, 1],
+#             "relation": "<=",
+#             "rhs": 8
+#         },
+#         {
+#             "name": "constraint3",
+#             "coefficients": [0, 1],
+#             "relation": "<=",
+#             "rhs": 2
+#         },
+#         {
+#             "name": "constraint4",
+#             "coefficients": [1, 0],
+#             "relation": ">=",
+#             "rhs": 0
+#         }, 
+#         {
+#             "name": "constraint3",
+#             "coefficients": [0, 1],
+#             "relation": ">=",
+#             "rhs": 0
+#         }
+#     ]
+# }
 
-lp_solver = LinearProgrammingSolver(json_data)
-lp_solver.combinations_line()
-lp_solver.findPoints()
-lp_solver.find_optimal_value()
+# lp_solver = LinearProgrammingSolver(json_data)
+# lp_solver.combinations_line()
+# lp_solver.findPoints()
+# lp_solver.find_optimal_value()

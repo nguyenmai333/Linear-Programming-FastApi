@@ -1,10 +1,11 @@
 body {
     margin:0 auto;
+    padding: 0;
 }
 .container {
     width: 100vw;
     height: 100vh;
-    background-color: rgb(243, 230, 213)  ;
+    background-color: rgb(255, 255, 255)  ;
 }
 .nav {
     display: flex;
@@ -14,8 +15,14 @@ body {
 }
 
 .nav .item {
-    border: 1px solid black;
+    border-right: 2px solid black;
     padding: 10px;
+    cursor: pointer;
+}
+
+.problem {
+    border: 1px solid black;
+    padding: 20px;
 }
 
 .nav .title {
@@ -32,4 +39,9 @@ body {
     width: 100%;
     height: 100%;
     
+}
+
+.container .item {
+    padding: 20px;
+    font-size: 20px;
 }

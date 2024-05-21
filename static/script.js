@@ -105,12 +105,24 @@ function confirmExpression() {
     .then(data => {
         if (data.is_valid) {
             console.log('Valid expression.');
-            console.log(data.json_expression);
-            console.log(data.expression_formatted);
+            fetch('/calculate/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+
+            })
+            .catch((e) => {
+                console.error('error:', e);
+                alert('Error');
+            })
         } else {
             alert("Invalid expression.");
         }
-        console.log(data); // Log phản hồi từ server
     })
     .catch((error) => {
         console.error('Error:', error);
