@@ -92,11 +92,11 @@ class LinearProgrammingBasicSolver:
                 recall_max = point
 
         if self.objective['type'] == 'max':
-            self.results['var'] = max_val
-            self.results['val'] = recall_max
+            self.results['val'] = max_val
+            self.results['var'] = recall_max
         else:
-            self.results['var'] = min_val
-            self.results['val'] = recall_min
+            self.results['val'] = min_val
+            self.results['var'] = recall_min
 
 # # Sử dụng class
 # json_data = {

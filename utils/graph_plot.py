@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import json
 import numpy as np
@@ -37,7 +38,10 @@ def graph_generator(lp_data):
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     plt.xlim(0, 8)
     plt.ylim(0, 6)
-    plot_filename = "templates/images/graph.png"
-    plt.savefig(plot_filename)
-    with open(plot_filename, "rb") as file:
-        plot_data = file.read()
+    
+    image_stream = BytesIO()
+    plt.savefig(image_stream, format='png')
+    plt.close()
+    image_stream.seek(0)
+    
+    return image_stream

@@ -1,8 +1,16 @@
+function math_covert(val) {
+    function formattedOperators(expression) {
+        return expression.replace(/_/g, '')
+                         .replace(/\*/g, '\\times ')
+                         .replace(/<=/g, '\\le ');
+    }
+    val = formattedOperators(val);
+    return val
+}
+
 function get_data() {
     const baseUrl = window.location.origin;
-    console.log('Base URL:', baseUrl);
     const apiUrl = baseUrl + '/get_json/';
-    console.log('API URL:', apiUrl);
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) {
@@ -11,15 +19,26 @@ function get_data() {
             return response.json();
         })
         .then(data => {
-            console.log('Data:', data);
+            const ExpressionList = data.expression_formatted.constraints;
+            console.log(ExpressionList)
+            const problemElement = document.getElementById('problem');
+            const spanProblem = document.createElement('span');
+            spanProblem.innerText = `\\(${'Problem: ' + data['expression_formatted'].problem + '(' + data['expression_formatted'].expression_problem + ')'}\\)`;
+            problemElement.appendChild(spanProblem);
+            
+            for (const property in ExpressionList) {
+                const formattedExpression = math_covert(ExpressionList[property]);
+                const spanFormattedExpression = document.createElement('li');
+                spanFormattedExpression.innerText = `\\(${formattedExpression}\\) `;
+                problemElement.appendChild(spanFormattedExpression);
+            }
 
-            // Display the data on the webpage
-            document.getElementById('outputVar').innerText = 'Var: ' + data.var;
-            document.getElementById('outputVal').innerText = 'Val: ' + JSON.stringify(data.val, null, 2);
+            document.getElementById('outputVal').innerText = 'Optimal value: ' + data['graph_method'].val;
+            document.getElementById('outputVar').innerText = 'Coordinate: ('  + String(data['graph_method'].var[0]) +', ' + String(data['graph_method'].var[1]) + ')';
+            MathJax.typeset(); // Typeset MathJax content after updating
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            // Display an error message on the webpage
             document.getElementById('output').innerText = 'Error: ' + error.message;
         });
 }

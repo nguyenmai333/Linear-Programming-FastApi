@@ -5,25 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../static/solve.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
 </head>
 <body>
     <div class="container">
-        <div class="nav">
-            <div class="item">Method 1</div>
-            <div class="item">Method 2</div>
-            <div class="item">Method 3</div>
-            <div class="title">Linear Programming Solve</div>
-        </div>
-        <div class="problem">
-            
+          <ul class="nav">
+            <li><a href="default.asp">Method 1</a></li>
+            <li><a href="news.asp">Method 2</a></li>
+            <li><a href="contact.asp">Method 3</a></li>
+            <li><a href="about.asp">Method 4</a></li>
+          </ul>
+        <div class="expression-container">
+            <div id="problem">
+            </div>
+            <div class="expression-item">
+
+            </div>
         </div>
         <div class="content">
-            <div id="outputVar" class="item"></div>
-            <div id="outputVal" class="item"></div>
-            <img id="plotImage" src="images/graph.png" alt="Plot Image">
+            <span style="margin-left: 20px;">Result: </span>
+            <li style = 'list-style-type: circle;'id="outputVar" class="item"></li>
+            <li style = 'list-style-type: circle;'id="outputVal" class="item"></li>
+            <img id="plotImage" src="/graph" alt="Plot Image">
         </div>
     </div>
-    <script src="../static/formatExpression.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
     <script src="../static/sbs.js"></script>
 </body>
 </html>
