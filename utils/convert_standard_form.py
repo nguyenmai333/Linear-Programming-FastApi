@@ -65,13 +65,15 @@ class StandardForm:
         coeffs = []
         constraints = []
 
+        j = 0
         num_of_variables = len(transformed_data["objective"]["coefficients"])
         for i, constraint in enumerate(transformed_data["constraints"]):
             coefficients = constraint["coefficients"] + [0] * (len(obj_func) - len(constraint["coefficients"]))
             if not (coefficients.count(1) == 1 and coefficients.count(0) == (len(obj_func) - 1) and constraint["rhs"] == 0):
                 coeffs.append(coefficients)
-                coeffs[i][num_of_variables + i] = 1
+                coeffs[j][num_of_variables + j] = 1
                 constraints.append(constraint["rhs"])
+                j += 1
 
         return obj_func, coeffs, constraints
 
