@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to HTML Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<table id="jsonTable">
+    <thead>
+        <tr id="tableHeader"></tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+    const jsonData = null
+    fetch('http://127.0.0.1:1400/get_json/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            jsonData = data.simplex_solver.table
+        })
+    console.log(jsonData)
+    const tableHeaderRow = document.getElementById("tableHeader");
+    jsonData.header.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        tableHeaderRow.appendChild(th);
+    });
+    const tableBody = document.getElementById("tableBody");
+    jsonData.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        const tdName = document.createElement("td");
+        tdName.textContent = row.name;
+        tr.appendChild(tdName);
+        row.values.forEach(value => {
+            const tdValue = document.createElement("td");
+            tdValue.textContent = value;
+            tr.appendChild(tdValue);
+        });
+        tableBody.appendChild(tr);
+    });
+</script>
+
+</body>
+</html>

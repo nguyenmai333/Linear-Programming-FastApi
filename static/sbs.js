@@ -8,7 +8,7 @@ function math_covert(val) {
     return val
 }
 
-function get_data() {
+function fetch_data() {
     const baseUrl = window.location.origin;
     const apiUrl = baseUrl + '/get_json/';
     fetch(apiUrl)
@@ -43,4 +43,45 @@ function get_data() {
         });
 }
 
-get_data();
+function createSimplexSolverTable() {
+    let jsonData = null
+    const baseUrl = window.location.origin;
+    const apiUrl = baseUrl + '/get_json/';
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            jsonData = data.simplex_solver.table[0];
+            const tableHeaderRow = document.getElementById("tableHeader");
+            jsonData = JSON.parse(jsonData)
+            jsonData.header.forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                tableHeaderRow.appendChild(th);
+            });
+            const tableBody = document.getElementById("tableBody");
+            jsonData.rows.forEach(row => {
+                const tr = document.createElement("tr");
+                const tdName = document.createElement("td");
+                tdName.textContent = row.name;
+                tr.appendChild(tdName);
+                row.values.forEach(value => {
+                    const tdValue = document.createElement("td");
+                    tdValue.textContent = value;
+                    tr.appendChild(tdValue);
+                });
+                tableBody.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
+
+fetch_data();
+createSimplexSolverTable();

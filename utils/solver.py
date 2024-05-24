@@ -12,7 +12,6 @@ from .exceptions import SizeMismatchError
 from .exceptions import UnsolvableError
 from .tableau import Tableau
 
-
 class SimplexSolver:
     """
     Solves a Linear Programming problem using Dantzig's Simplex Method
@@ -61,6 +60,12 @@ class SimplexSolver:
         )
 
     def solve(self, max_iterations=10, use_blands_rule=False, print_tableau=True):
+
+        step_by_step = {
+            'table': [],
+            'step_info': []
+        }
+
         """
         Solves Linear Programming Problem. Returns `Solution` instance`.
 
@@ -73,17 +78,14 @@ class SimplexSolver:
         print_tableau : bool
            whether to print the tableau at every iteration
         """
-
         # configure logging
         logging.basicConfig(stream=sys.stdout,
                             format='%(message)s',
                             level=logging.DEBUG if print_tableau else logging.INFO)
-
         with self.tableau as t:
             # if incomplete basis, use two-phase method
             if -1 in t.basis:
                 logging.info("No identifiable basis. Using two-phase method.")
-
                 # solve phase 1 problem
                 t.add_artificial_variables()
                 logging.debug(f"\nPhase I Tableau:")
@@ -98,6 +100,7 @@ class SimplexSolver:
                 logging.debug(f'\nPhase II Tableau:')
 
             # print starting/phase 2 tableau
+            step_by_step['table'].append(f'{t}')
             logging.debug(f'{t}\n')
 
             iterations = 0
@@ -108,6 +111,8 @@ class SimplexSolver:
                     f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # log pivots
                 logging.debug(f'{t}\n')  # log tableau
                 iterations += 1
+                step_by_step['table'].append(f'{t}')
+                step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
 
             # resort to Bland's rule if necessary
             if not use_blands_rule:
@@ -118,7 +123,7 @@ class SimplexSolver:
             raise UnsolvableError(max_iterations)
 
         return Solution(state=t.state, basis=t.basis,
-                        solution=t.solution, obj_value=t.obj_value)
+                        solution=t.solution, obj_value=t.obj_value), step_by_step
 
 
 class Solution:

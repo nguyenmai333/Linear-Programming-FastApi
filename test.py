@@ -7,9 +7,7 @@ def main(json_file):
     sf = StandardForm(json_file)
     obj_func, coeffs, constraints = sf.to_standard_form()
     solver = SimplexSolver(obj_func, coeffs, constraints)
-    sol = solver.solve()
-
-    print(sol)
+    sol, step_by_step = solver.solve()
 
     if sf.target:
         sol.obj_value = -sol.obj_value
@@ -18,6 +16,7 @@ def main(json_file):
         print("Gia tri toi uu cua P:", sol.obj_value)
     print("Nghiem toi uu cua P:", sol.solution)
 
+    print(step_by_step)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Simplex Solver on given JSON file.')
     parser.add_argument('json_file', type=str, help='Path to the JSON file containing the LPP data.')

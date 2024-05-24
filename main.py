@@ -11,6 +11,9 @@ from utils.formatter import jsonFormatter
 from utils.validate_expression import isValidateExpression
 from utils.simplex_method_2var import LinearProgrammingBasicSolver
 from utils.graph_plot import graph_generator
+from utils.solver import SimplexSolver
+from utils.convert_standard_form import StandardForm
+import re
 
 app = FastAPI(debug=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -22,6 +25,48 @@ image_stream = None
 
 class Expression(BaseModel):
     expression: str
+
+
+def splitTable(table):
+    pos_ = table.find('RHS') + len('RHS')
+    left, right = table[:pos_], table[pos_:]
+    header = left.split(' ')
+    header.pop(0)
+    pattern = re.compile(r'(\w+)\s+\[([-\d.\s]+)\]')
+    matches = pattern.findall(right)
+    rows = []
+    for name, values in matches:
+        values_list = values.split()
+        row = {
+            "name": name,
+            "values": values_list
+        }
+        rows.append(row)
+    structured_data = {
+        "header": header,
+        "rows": rows
+    }
+    structured_data["header"] = [item for item in structured_data["header"] if item]
+    return json.dumps(structured_data, indent=4)
+
+def simplexSolver(data):
+    sf = StandardForm(data)
+    obj_func, coeffs, constraints = sf.to_standard_form()
+    solver = SimplexSolver(obj_func, coeffs, constraints)
+    sol, step_by_step = solver.solve()
+    formatted_table = []
+    for i in step_by_step['table']:
+        formatted_table.append(splitTable(i))
+    step_by_step['table'] = formatted_table
+    if sf.target:
+        sol.obj_value = -sol.obj_value
+        print("Gia tri toi uu cua P:", sol.obj_value)
+    else:
+        print("Gia tri toi uu cua P:", sol.obj_value)
+    print("Nghiem toi uu cua P:", sol.solution)
+
+
+    return step_by_step, sol.obj_value, sol.solution
     
 def preFormatConstraints(expr):
     for id_, val in enumerate(expr):
@@ -43,11 +88,6 @@ async def read_item(request: Request):
 async def read_item(request: Request):
     return templates.TemplateResponse("solve.html", {"request": request})
 
-
-@app.get("/result/")
-async def api_(data: dict):
-    pass
-
 @app.post("/calculate/")
 async def calculate_expression(data: dict):
     global stored_result
@@ -55,8 +95,10 @@ async def calculate_expression(data: dict):
     try:
         json_loader = json.loads(data['json_expression'])
         res = graph_method(json_loader)
+        simplex_solver_res = simplexSolver(json_loader)
         image_stream = graph_generator(json_loader)
         stored_result['graph_method'] = res
+        stored_result['simplex_solver'], stored_result['simplex_solver']['val'], stored_result['simplex_solver']['var'] = simplex_solver_res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

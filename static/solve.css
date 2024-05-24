@@ -1,37 +1,53 @@
-html, body {margin: 0; height: 100%; overflow: hidden; }
+/* Ensure HTML and body take up the full viewport height */
+html, body {
+    margin: 0;
+    height: 100%;
+}
 
+/* Set container to take up full viewport width and height */
 .container {
     width: 100%;
     height: 100%;
 }
+
+/* Styling for navigation */
 .nav {
     display: flex;
     border: 2px solid black;
     border-radius: 2px;
 }
 
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-
-li {
+.nav li {
     padding: 10px 20px;
     text-decoration: none;
     list-style-type: none;
     cursor: pointer;
-}
-
-.nav li {
     border-right: 1px solid black;
 }
 
-li a{
+.nav li:last-child {
+    border-right: none; /* Remove right border for last li in nav */
+}
+
+.nav li a {
     text-decoration: none;
     color: black;
 }
 
+/* Styling for table */
+
+.content table {
+    border-collapse: collapse;
+    width: 30%;
+}
+
+.content th, .content td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+/* Styling for expression container */
 .expression-container {
     margin: 20px;
     width: 40%;
@@ -39,23 +55,12 @@ li a{
     padding: 20px;
 }
 
-.nav .title {
-    display: flex;
-    left: 28%;
-    font-size: 20px;
-    font-weight: 1000;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-}
-
-.container .content {
-    width: 100%;
-    height: 100%;
-    
-}
-
 .expression-container #problem {
     display: flex;
     flex-direction: column;
+}
+
+/* Styling for output items */
+.content .item {
+    list-style-type: circle;
 }
