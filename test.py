@@ -1,12 +1,11 @@
 # File: run_simplex.py
 import argparse
-from simplex.solver import SimplexSolver
-from simplex.convert_standard_form import StandardForm
+from utils.solver import SimplexSolver
+from utils.convert_standard_form import StandardForm
 
 def main(json_file):
     sf = StandardForm(json_file)
     obj_func, coeffs, constraints = sf.to_standard_form()
-
     solver = SimplexSolver(obj_func, coeffs, constraints)
     sol = solver.solve()
 

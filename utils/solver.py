@@ -6,7 +6,7 @@ import sys
 from typing import List
 
 import numpy as np
-
+import json
 from .exceptions import LinearlyDependentError
 from .exceptions import SizeMismatchError
 from .exceptions import UnsolvableError

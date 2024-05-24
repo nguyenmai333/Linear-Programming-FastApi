@@ -15,10 +15,12 @@ ul {
     margin: 0;
     padding: 0;
   }
+
 li {
     padding: 10px 20px;
     text-decoration: none;
     list-style-type: none;
+    cursor: pointer;
 }
 
 .nav li {
@@ -27,6 +29,7 @@ li {
 
 li a{
     text-decoration: none;
+    color: black;
 }
 
 .expression-container {
