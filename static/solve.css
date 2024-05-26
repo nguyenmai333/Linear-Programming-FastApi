@@ -64,3 +64,8 @@ html, body {
 .content .item {
     list-style-type: circle;
 }
+
+table {
+    margin-left: 5%;
+    margin-bottom: 5%;
+}

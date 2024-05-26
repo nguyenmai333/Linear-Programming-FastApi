@@ -42,9 +42,8 @@ function fetch_data() {
             document.getElementById('output').innerText = 'Error: ' + error.message;
         });
 }
-
 function createSimplexSolverTable() {
-    let jsonData = null
+    let jsonData = null;
     const baseUrl = window.location.origin;
     const apiUrl = baseUrl + '/get_json/';
     fetch(apiUrl)
@@ -55,32 +54,64 @@ function createSimplexSolverTable() {
             return response.json();
         })
         .then(data => {
-            jsonData = data.simplex_solver.table[0];
-            const tableHeaderRow = document.getElementById("tableHeader");
-            jsonData = JSON.parse(jsonData)
-            jsonData.header.forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                tableHeaderRow.appendChild(th);
-            });
-            const tableBody = document.getElementById("tableBody");
-            jsonData.rows.forEach(row => {
-                const tr = document.createElement("tr");
-                const tdName = document.createElement("td");
-                tdName.textContent = row.name;
-                tr.appendChild(tdName);
-                row.values.forEach(value => {
-                    const tdValue = document.createElement("td");
-                    tdValue.textContent = value;
-                    tr.appendChild(tdValue);
+            jsonData = data.simplex_solver.table;
+            jsonStep = data.simplex_solver.step_info;
+            let step_cnt = 0;
+            let limited_length = jsonData.length;
+            jsonData.forEach( (e) => {
+                jsonData = JSON.parse(e);
+                const jsonTable = document.createElement('table');
+                jsonTable.id = 'jsonTable';
+                
+                const ele_thead = document.createElement('thead');
+                ele_thead.setAttribute('id', 'tableHead');
+                const ele_tbody = document.createElement('tbody');
+                ele_tbody.setAttribute('id', 'tableBody');
+                jsonTable.appendChild(ele_thead);
+                jsonTable.appendChild(ele_tbody);
+                
+                // Creating the header row
+                const tableHeaderRow = document.createElement("tr");
+                tableHeaderRow.appendChild(document.createElement("th"));
+                jsonData.header.forEach(header => {
+                    const th = document.createElement("th");
+                    th.textContent = header;
+                    tableHeaderRow.appendChild(th);
                 });
-                tableBody.appendChild(tr);
-            });
+                
+                ele_thead.appendChild(tableHeaderRow);
+                // Creating the body rows
+                jsonData.rows.forEach(row => {
+                    const tr = document.createElement("tr");
+                    
+                    const tdName = document.createElement("td");
+                    tdName.textContent = row.name;
+                    tr.appendChild(tdName);
+                    
+                    row.values.forEach(value => {
+                        const tdValue = document.createElement("td");
+                        tdValue.textContent = value;
+                        tr.appendChild(tdValue);
+                    });
+                    
+                    ele_tbody.appendChild(tr);
+                });
+                document.getElementsByClassName('content')[1].appendChild(jsonTable);
+                if (step_cnt < limited_length - 1) {
+                    const step_info = document.createElement('div');
+                    step_info.setAttribute('style','margin-left: 5%; margin-bottom: 1%;');
+                    step_info.innerText = jsonStep[step_cnt];
+                    document.getElementsByClassName('content')[1].appendChild(step_info);
+                    step_cnt += 1;
+                }
+                
+            })
         })
         .catch(error => {
             console.error('Error fetching data:', error);
         });
 }
+
 
 
 fetch_data();
