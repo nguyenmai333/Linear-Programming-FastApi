@@ -4,6 +4,9 @@
 from typing import List
 
 import numpy as np
+import io
+import contextlib
+import logging
 
 from .exceptions import InfeasibleProblem
 from .exceptions import ReachedOptimality
@@ -75,12 +78,13 @@ class Tableau:
 
         # state of tableau (None, Optimal, Unbounded, or Infeasible)
         self.state = None
+        self.index = {}
 
     def __repr__(self):
         """
         Returns string representation of tableau.
         """
-
+        self.index = {}
         # suppress scientific notation
         np.set_printoptions(suppress=True)
 
@@ -96,9 +100,25 @@ class Tableau:
         # top row with variables
         top = "     " + rows[0].replace('.', 'x').replace('-1x', 'RHS')[2:-1]
 
-        # add basis variables
-        return '\n'.join([top] + [f'{f"x{var + 1}" if var != "" else "z "} {row}'
-                                  for row, var in zip(rows[1:], [''] + self.basis)])
+        row_strings = []
+
+        # Danh sách tên các biến cơ bản (basis)
+        basis = [''] + self.basis  # Thêm '' cho hàng đầu tiên (hàng z)
+        # Lặp qua từng hàng trong bảng
+        for row, var in zip(rows[1:], basis):
+            # Tạo chuỗi đại diện cho hàng
+            if var != "":
+                row_string = f'x{var + 1} {row}'
+                name = f'x{var + 1}'
+                self.index[name] = row
+            else:
+                row_string = f'z  {row}'
+                self.index["z"] = row
+            row_strings.append(row_string)
+        # Ghép tiêu đề và các hàng lại với nhau
+        result_string = '\n'.join([top] + row_strings)
+        return result_string
+
 
     def __enter__(self):
         """ Enter method for context manager. Returns self."""
@@ -159,6 +179,43 @@ class Tableau:
                     basis[i] = j
 
         return list(basis)
+    
+    @property
+    def has_negative_rhs(self) -> bool:
+        """
+        Checks if there are any negative values in the RHS (last column).
+        """
+        return any(self.tab[1:, -1] < 0)
+    
+    @property
+    def has_negative_coef(self) -> bool:
+        return any(self.tab[0, :-1] < 0)
+    
+    @property
+    def continue_phase_2(self) -> bool:
+        return self.tab[0, 0] == 1 and all(self.tab[0, 1:-1] == 0)
+
+   
+    def change_target_2phase(self):
+        self.tab = self.tab[:, 1:]
+        old_target = self.obj_func
+        print("Let x_0 = 0")
+        print(self)
+        tmp_self_tab = self.tab.copy()
+
+        num_of_variables = np.count_nonzero(self.obj_func)
+        calculate_target = [0] *len(tmp_self_tab[0])
+                
+        index_list = list(self.index)
+        for i in range(num_of_variables):
+            name = f'x{i+1}'
+            if name in index_list:
+                pos = index_list.index(name)
+                tmp_self_tab[pos][i] = 0
+                calculate_target += old_target[i] * -(tmp_self_tab[pos])
+        
+        self.tab[0] = calculate_target
+        return self
 
     def pivot(self, use_blands_rule=False):
         """
@@ -221,11 +278,53 @@ class Tableau:
 
         # divide row by pivot
         self.tab[r] /= self.tab[r, c]
+        self.tab[0, -1] = -self.tab[0, -1]
+        # zero out column, except for pivot
+        self.tab -= [self.tab[r] * self.tab[i, c] if i != r else np.zeros_like(self.tab[r])
+                     for i, row in enumerate(self.tab)]
+        self.tab[0, -1] = -self.tab[0, -1]
+
+    def add_x0_to_tableau(self):
+        """
+        Adds a new variable (e.g., x3) to the tableau.
+        """
+        # Shape of the original tableau
+        new_col = np.array([1] + [-1] * (self.tab.shape[0] - 1))
+        self.tab = np.insert(self.tab, 0, new_col, axis=1)
+        return self.tab
+    
+    def pivot_around_2phase(self) -> None:
+        """
+        Pivots tableau object given a row and column.
+
+        Parameters
+        ----------
+        r : index of departing variable
+        c : index of entering variable
+
+        Notes
+        -----
+        Indices are relative to the tableau; they are not the constraint
+        or variable indices.
+        """
+        # Lấy cột cuối cùng (RHS)
+        rhs_column = self.tab[:, -1]
+
+        # Tìm dòng có giá trị RHS âm nhất
+        r = np.argmin(rhs_column)
+        c = 0
+        # divide row by pivot
+        self.tab[r] /= self.tab[r, c]
+        self.tab[0, -1] = -self.tab[0, -1]
 
         # zero out column, except for pivot
         self.tab -= [self.tab[r] * self.tab[i, c] if i != r else np.zeros_like(self.tab[r])
                      for i, row in enumerate(self.tab)]
+        logging.info(
+                    f" Departing_Row: {r}, Entering_Col: {c}")
+        self.tab[0, -1] = -self.tab[0, -1]
 
+    
     def add_artificial_variables(self):
         """
         Inserts artificial columns in tableau and calculates new reduced
