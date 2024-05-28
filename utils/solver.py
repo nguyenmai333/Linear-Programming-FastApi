@@ -3,14 +3,15 @@
 
 import logging
 import sys
-from typing import List
+from typing import List, Dict, Any
 
 import numpy as np
-import json
+
 from .exceptions import LinearlyDependentError
 from .exceptions import SizeMismatchError
 from .exceptions import UnsolvableError
 from .tableau import Tableau
+
 
 class SimplexSolver:
     """
@@ -37,7 +38,11 @@ class SimplexSolver:
         constraints: values of the constraint column-vector (right-hand
         side). Must be size *m*.
         """
-
+        self.simplex_solver = {}
+        self.simplex_solver["table"] = []
+        self.simplex_solver["step_info"] = []
+        
+        self.phase = False
         # validate dimensions
         m = len(constraints)  # rows
         n = len(obj_func)  # columns
@@ -58,72 +63,99 @@ class SimplexSolver:
             coeffs=coeffs,
             constraints=constraints
         )
-
+        self.original_target = []
+    
     def solve(self, max_iterations=10, use_blands_rule=False, print_tableau=True):
-
-        step_by_step = {
-            'table': [],
-            'step_info': []
-        }
-
         """
         Solves Linear Programming Problem. Returns `Solution` instance`.
 
         Parameters
         ----------
         max_iterations : int
-           number of times to pivot before resorting to Bland's rule
+            Number of times to pivot before resorting to Bland's rule.
         use_blands_rule : bool
-           whether to use Bland's Rule for anti-cycling
+            Whether to use Bland's Rule for anti-cycling.
         print_tableau : bool
-           whether to print the tableau at every iteration
+            Whether to print the tableau at every iteration.
         """
-        # configure logging
+
+        # Configure logging
         logging.basicConfig(stream=sys.stdout,
                             format='%(message)s',
                             level=logging.DEBUG if print_tableau else logging.INFO)
+
         with self.tableau as t:
-            # if incomplete basis, use two-phase method
-            if -1 in t.basis:
+            
+            if t.has_negative_rhs:
+                logging.debug(f'{t}\n')
                 logging.info("No identifiable basis. Using two-phase method.")
-                # solve phase 1 problem
+
+                # Solve phase 1 problem
                 t.add_artificial_variables()
+                t.add_x0_to_tableau()
+                logging.debug(f"\nAdd aritificial variable to first column of matrix")
+                logging.debug(f'{t}\n')
+                self.phase = True
                 logging.debug(f"\nPhase I Tableau:")
-                sol = self.solve(max_iterations=max_iterations)
-
-                # if phase I is infeasible
-                if not sol.solution:
-                    return sol
-
-                # begin solving phase II
-                t.drop_artificial_variables()
-                logging.debug(f'\nPhase II Tableau:')
-
-            # print starting/phase 2 tableau
-            step_by_step['table'].append(f'{t}')
-            logging.debug(f'{t}\n')
-
-            iterations = 0
-            # keep pivoting until exception is raised or max iterations
-            while iterations < max_iterations:
+                t.pivot_around_2phase()
+                print(t)
+                self.solve(max_iterations=max_iterations)
+                
+            elif t.has_negative_coef and self.phase:
                 t.pivot(use_blands_rule=use_blands_rule)
-                logging.info(f"[{iterations + 1}]"
-                    f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # log pivots
-                logging.debug(f'{t}\n')  # log tableau
-                iterations += 1
-                step_by_step['table'].append(f'{t}')
-                step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
+                logging.info(
+                    f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
+                logging.debug(f'{t}\n')  # Log tableau
+                self.solve(max_iterations=max_iterations)
+    
+            elif not(t.continue_phase_2) and self.phase:
+                t.state = "Infeasible"
+                
+            elif not(t.has_negative_coef) and t.continue_phase_2 and self.phase:
+                logging.debug(f'\nPhase II Tableau:')
+                t.change_target_2phase()   
+                logging.debug(f'New target')      
+                logging.debug(f'{t}\n')
+                iterations = 0
+                # Keep pivoting until exception is raised or max iterations
+                while iterations < max_iterations:
+                    t.pivot(use_blands_rule=use_blands_rule)
+                    logging.info(
+                    f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
+                    logging.debug(f'{t}\n')  # Log tableau
+                    iterations += 1
 
-            # resort to Bland's rule if necessary
-            if not use_blands_rule:
-                logging.info("Possible Cycling detected. Resorting to Bland's Rule.")
-                return self.solve(use_blands_rule=True)
+                # Resort to Bland's rule if necessary
+                if not use_blands_rule:
+                    logging.info("Possible Cycling detected. Resorting to Bland's Rule.")
+                    return self.solve(use_blands_rule=True)
 
-            # if no solution if found
-            raise UnsolvableError(max_iterations)
+                # If no solution is found
+                raise UnsolvableError(max_iterations)
+                
+                
+            else:                
+                logging.debug(f'{t}\n')
+                iterations = 0
+                # Keep pivoting until exception is raised or max iterations
+                while iterations < max_iterations:
+                    t.pivot(use_blands_rule=use_blands_rule)
+                    logging.info(
+                    f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
+                    logging.debug(f'{t}\n')  # Log tableau
+                    iterations += 1
+
+                # Resort to Bland's rule if necessary
+                if not use_blands_rule:
+                    logging.info("Possible Cycling detected. Resorting to Bland's Rule.")
+                    return self.solve(use_blands_rule=True)
+
+                # If no solution is found
+                raise UnsolvableError(max_iterations)
 
         return Solution(state=t.state, basis=t.basis,
-                        solution=t.solution, obj_value=t.obj_value), step_by_step
+                        solution=t.solution, obj_value=t.obj_value)
+
 
 
 class Solution:
@@ -144,13 +176,13 @@ class Solution:
         solution : raw solution from tableau
         """
         self.state = state
-
         # objective value
-        self.obj_value = {
-            "Optimal": -obj_value,
-            "Unbounded": np.inf,
-            "Infeasible": np.NaN
-        }[self.state]
+        if obj_value != None:
+            self.obj_value = {
+                "Optimal": obj_value,
+                "Unbounded": np.inf,
+                "Infeasible": np.NaN
+            }[self.state]
 
         # calculate solution if optimal
         if self.state == "Optimal":
