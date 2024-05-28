@@ -213,7 +213,7 @@ class Tableau:
                 pos = index_list.index(name)
                 tmp_self_tab[pos][i] = 0
                 calculate_target += old_target[i] * -(tmp_self_tab[pos])
-        
+        calculate_target[-1] = -calculate_target[-1]
         self.tab[0] = calculate_target
         return self
 
