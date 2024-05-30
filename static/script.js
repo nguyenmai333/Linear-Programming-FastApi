@@ -12,7 +12,7 @@ function listen_user() {
     } else {
         console.log("User canceled the prompt.");
     }
-    addCharacter('x_'+number)
+    addCharacter('x'+number)
 }
 
 function AddInputTag() {
