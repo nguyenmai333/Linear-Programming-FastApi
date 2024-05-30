@@ -1,16 +1,12 @@
 import json
 
 class StandardForm:
-    def __init__(self, json_file: str) -> None:
-        self._load_from_json(json_file)
+    def __init__(self, data) -> None:
+        self.data = data
         self.target = False
         self.smaller_constraint = False
         self.free = False
         self.original_target = []
-    
-    def _load_from_json(self, json_file: str) -> None:
-        with open(json_file, 'r') as file:
-            self.data = json.load(file)
 
     def change_target(self, coefs):
         new_target = "min"
