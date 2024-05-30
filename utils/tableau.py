@@ -293,7 +293,7 @@ class Tableau:
         self.tab = np.insert(self.tab, 0, new_col, axis=1)
         return self.tab
     
-    def pivot_around_2phase(self) -> None:
+    def pivot_around_2phase(self):
         """
         Pivots tableau object given a row and column.
 
@@ -320,10 +320,8 @@ class Tableau:
         # zero out column, except for pivot
         self.tab -= [self.tab[r] * self.tab[i, c] if i != r else np.zeros_like(self.tab[r])
                      for i, row in enumerate(self.tab)]
-        logging.info(
-                    f" Departing_Row: {r}, Entering_Col: {c}")
         self.tab[0, -1] = -self.tab[0, -1]
-
+        return r, c
     
     def add_artificial_variables(self):
         """
