@@ -1,3 +1,11 @@
+function countVariables(expression) {
+    const variablePattern = /x_\d+/g;
+    const matches = expression.match(variablePattern);
+    // Use a Set to store unique variables
+    const uniqueVariables = new Set(matches);
+    return uniqueVariables.size;
+}
+
 function math_covert(val) {
     function formattedOperators(expression) {
         return expression.replace(/_/g, '')
@@ -20,22 +28,27 @@ function fetch_data() {
         })
         .then(data => {
             const ExpressionList = data.expression_formatted.constraints;
-            console.log(ExpressionList)
-            const problemElement = document.getElementById('problem');
-            const spanProblem = document.createElement('span');
-            spanProblem.innerText = `\\(${'Problem: ' + data['expression_formatted'].problem + '(' + data['expression_formatted'].expression_problem + ')'}\\)`;
-            problemElement.appendChild(spanProblem);
-            
-            for (const property in ExpressionList) {
-                const formattedExpression = math_covert(ExpressionList[property]);
-                const spanFormattedExpression = document.createElement('li');
-                spanFormattedExpression.innerText = `\\(${formattedExpression}\\) `;
-                problemElement.appendChild(spanFormattedExpression);
+            const numberOfVariables = countVariables(data.expression_formatted.expression_problem);
+            if (numberOfVariables == 2) {
+                const problemElement = document.getElementById('problem');
+                const spanProblem = document.createElement('span');
+                spanProblem.innerText = `\\(${'Problem: ' + data['expression_formatted'].problem + '(' + data['expression_formatted'].expression_problem + ')'}\\)`;
+                problemElement.appendChild(spanProblem);
+                
+                for (const property in ExpressionList) {
+                    const formattedExpression = math_covert(ExpressionList[property]);
+                    const spanFormattedExpression = document.createElement('li');
+                    spanFormattedExpression.innerText = `\\(${formattedExpression}\\) `;
+                    problemElement.appendChild(spanFormattedExpression);
+                }
+    
+                document.getElementById('outputVal').innerText = 'Optimal value: ' + data['graph_method'].val;
+                document.getElementById('outputVar').innerText = 'Coordinate: ('  + String(data['graph_method'].var[0]) +', ' + String(data['graph_method'].var[1]) + ')';
+                MathJax.typeset(); // Typeset MathJax content after updating
+            } else {
+                document.getElementById('outputVar').textContent = '';
+                document.getElementById('outputVal').textContent = '';
             }
-
-            document.getElementById('outputVal').innerText = 'Optimal value: ' + data['graph_method'].val;
-            document.getElementById('outputVar').innerText = 'Coordinate: ('  + String(data['graph_method'].var[0]) +', ' + String(data['graph_method'].var[1]) + ')';
-            MathJax.typeset(); // Typeset MathJax content after updating
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -56,6 +69,10 @@ function createSimplexSolverTable() {
         .then(data => {
             jsonData = data.simplex_solver.table;
             jsonStep = data.simplex_solver.step_info;
+
+            document.getElementById('outputVal2').innerText = 'Optimal value: ' + data['simplex_solver'].val;
+            document.getElementById('outputVar2').innerText = 'Coordinate: ('  + String(data['simplex_solver'].var[0]) +', ' + String(data['simplex_solver'].var[1]) + ')';
+            
             let step_cnt = 0;
             let limited_length = jsonData.length;
             jsonData.forEach( (e) => {

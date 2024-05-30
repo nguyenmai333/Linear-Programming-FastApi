@@ -25,6 +25,25 @@ html, body {
     border-right: 1px solid black;
 }
 
+.step1 {
+    margin-left: 5%;
+    margin-bottom: 1%;
+}
+.result {
+    margin-left: 5%;
+    margin-bottom: 1%;
+}
+
+.table-header {
+    font-weight: 700;
+    margin: 20px;
+}
+.header {
+    font-weight: 700;
+    margin: 20px;
+}
+
+
 .nav li:last-child {
     border-right: none; /* Remove right border for last li in nav */
 }
@@ -35,7 +54,10 @@ html, body {
 }
 
 /* Styling for table */
+.content {
+    border: 1px solid black;
 
+}
 .content table {
     border-collapse: collapse;
     width: 30%;
