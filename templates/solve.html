@@ -11,6 +11,7 @@
 </head>
 <body>
     <div class="container">
+        <div class="title" style="display: flex; justify-content: center; align-items: center; font-size: 30px; font-weight: 700;">Solver</div>
         <div class="expression-container">
             <div id="problem">
             </div>
@@ -19,18 +20,31 @@
             </div>
         </div>
         <div class="content">
-            <span style="margin-left: 20px;">Result: </span>
-            <li style = 'list-style-type: circle;'id="outputVar" class="item"></li>
-            <li style = 'list-style-type: circle;'id="outputVal" class="item"></li>
+            <div class="header">Graph</div>
+            <div class="result">
+                <span style="margin-left: 20px; font-weight: 700;">Result: </span>
+                <li style = 'list-style-type: disc;'id="outputVar" class="item"></li>
+                <li style = 'list-style-type: disc;'id="outputVal" class="item"></li>
+            </div>
             <img id="plotImage" src="/graph" alt="Plot Image">
         </div>
-        <span>Table Solver</span>
         <div class="content">
+            <div class="table-header">
+                <span>Table Solver</span>
+            </div>
+            <div class="result">
+                <span style="font-weight: 700;">Result:</span>
+                <li style = 'list-style-type: disc;'id="outputVar2" class="item"></li>
+                <li style = 'list-style-type: disc;'id="outputVal2" class="item"></li>
+            </div>
+            <div class="step1">Create Table</div>
             <!-- <table id="jsonTable">
+               
                 <thead id="tableHead">
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table> -->
+      
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
