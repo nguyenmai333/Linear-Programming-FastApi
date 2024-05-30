@@ -58,12 +58,56 @@ def simplexSolver(data):
     for i in step_by_step['table']:
         formatted_table.append(splitTable(i))
     step_by_step['table'] = formatted_table
-    if sf.target:
-        sol.obj_value = -sol.obj_value
-        print("Gia tri toi uu cua P:", sol.obj_value)
-    else:
-        print("Gia tri toi uu cua P:", sol.obj_value)
-    print("Nghiem toi uu cua P:", sol.solution)
+    if not math.isnan(sol.obj_value):
+        if sf.target:
+            sol.obj_value = -sol.obj_value
+            print("Gia tri toi uu cua P:", sol.obj_value)
+            
+            if sf.smaller_constraint:
+                tmp = []
+                for j in range(len(sf.original_target)):
+                    if j in pos_smaller_constraint:
+                        tmp.append(-sol.solution[j])
+                    else:
+                        tmp.append(sol.solution[j])
+                sol.solution = tmp
+                
+            if sf.free:
+                result = 0
+                num_of_variables = len(sf.original_target)
+                true_variable = [0] * num_of_variables
+                if len(sol.solution) != 1:
+                    for i in range(num_of_variables):
+                        true_variable[i] = sol.solution[2*i] - sol.solution[2*i + 1]
+                    sol.solution = true_variable
+            
+        else: 
+            if sf.smaller_constraint:
+                tmp = []
+                for j in range(len(sf.original_target)):
+                    if j in pos_smaller_constraint:
+                            tmp.append(-sol.solution[j])
+                    else:
+                        tmp.append(sol.solution[j])
+                        
+                    new_result = 0
+                    for j in range(len(sf.original_target)):
+                        new_result += sf.original_target[j] * tmp[j]
+                    print("Gia tri toi uu cua P:", new_result)
+                    sol.solution = tmp
+                    
+            if sf.free:
+                result = 0
+                num_of_variables = len(sf.original_target)
+                true_variable = [0] * num_of_variables
+                for i in range(num_of_variables):
+                    true_variable[i] = sol.solution[2*i] - sol.solution[2*i + 1]
+                    result += sf.original_target[i] * true_variable[i]
+                print("Gia tri toi uu cua P:", result)
+                sol.solution = true_variable
+            else:
+                print("Gia tri toi uu cua P:", sol.obj_value)
+        print("Nghiem toi uu cua P:", sol.solution)
 
 
     return step_by_step, sol.obj_value, sol.solution
