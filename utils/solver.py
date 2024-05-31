@@ -100,7 +100,7 @@ class SimplexSolver:
                 t.add_x0_to_tableau()
                 logging.debug(f"\nAdd aritificial variable to first column of matrix")
                 logging.debug(f'{t}\n')
-                self.step_by_step['step_info'].append(f"Detect negative b. use the 2-phase method \n Add aritificial variable to first column of matrix")
+                self.step_by_step['step_info'].append(f"Detect negative b. Use the 2-phase method \n Add aritificial variable to first column of matrix")
                 self.step_by_step['table'].append(f'{t}')
                 self.phase = True
                 logging.debug(f"\nPhase I Tableau:")
