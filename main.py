@@ -14,6 +14,7 @@ from utils.graph_plot import graph_generator
 from utils.solver import SimplexSolver
 from utils.convert_standard_form import StandardForm
 import re
+import math
 
 app = FastAPI(debug=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -51,9 +52,10 @@ def splitTable(table):
 
 def simplexSolver(data):
     sf = StandardForm(data)
-    obj_func, coeffs, constraints = sf.to_standard_form()
+    obj_func, coeffs, constraints, pos_smaller_constraint = sf.to_standard_form()
     solver = SimplexSolver(obj_func, coeffs, constraints)
     sol, step_by_step = solver.solve()
+    print(step_by_step)
     formatted_table = []
     for i in step_by_step['table']:
         formatted_table.append(splitTable(i))
@@ -94,6 +96,7 @@ def simplexSolver(data):
                     for j in range(len(sf.original_target)):
                         new_result += sf.original_target[j] * tmp[j]
                     print("Gia tri toi uu cua P:", new_result)
+                    sol.obj_value = new_result
                     sol.solution = tmp
                     
             if sf.free:
@@ -104,6 +107,7 @@ def simplexSolver(data):
                     true_variable[i] = sol.solution[2*i] - sol.solution[2*i + 1]
                     result += sf.original_target[i] * true_variable[i]
                 print("Gia tri toi uu cua P:", result)
+                sol.obj_value = result
                 sol.solution = true_variable
             else:
                 print("Gia tri toi uu cua P:", sol.obj_value)

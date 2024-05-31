@@ -1,1 +1,0 @@
-{ "objective": { "type": "max", "coefficients": [ 1, 1 ] }, "constraints": [ { "name": "constraint1", "coefficients": [ 1.0, 0 ], "relation": ">=", "rhs": 0 }, { "name": "constraint2", "coefficients": [ 0, 1.0 ], "relation": ">=", "rhs": 0 }, { "name": "constraint3", "coefficients": [ 1.0, 1.0 ], "relation": "<=", "rhs": 5 } ] }

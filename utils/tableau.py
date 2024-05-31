@@ -92,8 +92,8 @@ class Tableau:
         top = np.arange(1, self.tab.shape[1] + 1)
         top[-1] = -1  # used as a placeholder
         tab = np.r_[top[np.newaxis, :], self.tab]
-        rows = str(tab).split('\n')
-
+        tmp  = np.array_str(tab, max_line_width=1000000)
+        rows = tmp.split('\n')
         # strip off extra bracket off last row
         rows[-1] = rows[-1][:-1]
 

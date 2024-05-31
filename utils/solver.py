@@ -41,6 +41,10 @@ class SimplexSolver:
         self.simplex_solver = {}
         self.simplex_solver["table"] = []
         self.simplex_solver["step_info"] = []
+        self.step_by_step = {
+            'table': [],
+            'step_info': []
+        }
         
         self.phase = False
         # validate dimensions
@@ -66,10 +70,6 @@ class SimplexSolver:
         self.original_target = []
     
     def solve(self, max_iterations=10, use_blands_rule=False, print_tableau=True):
-        step_by_step = {
-            'table': [],
-            'step_info': []
-        }
         """
         Solves Linear Programming Problem. Returns `Solution` instance`.
 
@@ -92,32 +92,33 @@ class SimplexSolver:
             
             if t.has_negative_rhs:
                 logging.debug(f'{t}\n')
-                step_by_step['table'].append(f'{t}')
-                logging.info("No identifiable basis. Using two-phase method.")
+                self.step_by_step['table'].append(f'{t}')
+                logging.info("Detect negative b. Use the 2-phase method")
                 
                 # Solve phase 1 problem
                 t.add_artificial_variables()
                 t.add_x0_to_tableau()
                 logging.debug(f"\nAdd aritificial variable to first column of matrix")
                 logging.debug(f'{t}\n')
-                step_by_step['table'].append(f'{t}')
+                self.step_by_step['step_info'].append(f"Detect negative b. use the 2-phase method \n Add aritificial variable to first column of matrix")
+                self.step_by_step['table'].append(f'{t}')
                 self.phase = True
                 logging.debug(f"\nPhase I Tableau:")
                 r, c = t.pivot_around_2phase()
                 logging.info(
                     f" Departing_Row: {r}, Entering_Col: {c}")
-                print(t)
-                step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
-                step_by_step['table'].append(f'{t}')
+                logging.debug(f'{t}\n')
+                self.step_by_step['step_info'].append(f" Departing_Row: {r}, Entering_Col: {c}")
+                self.step_by_step['table'].append(f'{t}')
                 self.solve(max_iterations=max_iterations)
                 
             elif t.has_negative_coef and self.phase:
                 t.pivot(use_blands_rule=use_blands_rule)
                 logging.info(
                     f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
-                step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
+                self.step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
+                self.step_by_step['table'].append(f'{t}')
                 logging.debug(f'{t}\n')  # Log tableau
-                step_by_step['table'].append(f'{t}')
                 self.solve(max_iterations=max_iterations)
     
             elif not(t.continue_phase_2) and self.phase:
@@ -125,24 +126,26 @@ class SimplexSolver:
                 
             elif not(t.has_negative_coef) and t.continue_phase_2 and self.phase:
                 logging.debug(f'\nPhase II Tableau:')
+                self.step_by_step['step_info'].append(f"\nPhase II Tableau \n New Target")
                 t.change_target_2phase()   
                 logging.debug(f'New target')      
                 logging.debug(f'{t}\n')
-                step_by_step['table'].append(f'{t}')
+                self.step_by_step['table'].append(f'{t}')
                 iterations = 0
                 # Keep pivoting until exception is raised or max iterations
                 while iterations < max_iterations:
                     t.pivot(use_blands_rule=use_blands_rule)
                     logging.info(
                     f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
-                    step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
+                    self.step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
                     logging.debug(f'{t}\n')  # Log tableau
-                    step_by_step['table'].append(f'{t}')
+                    self.step_by_step['table'].append(f'{t}')
                     iterations += 1
 
                 # Resort to Bland's rule if necessary
                 if not use_blands_rule:
                     logging.info("Possible Cycling detected. Resorting to Bland's Rule.")
+                    self.step_by_step['step_info'].append(f"Possible Cycling detected. Resorting to Bland's Rule.")
                     return self.solve(use_blands_rule=True)
 
                 # If no solution is found
@@ -151,15 +154,16 @@ class SimplexSolver:
                 
             else:                
                 logging.debug(f'{t}\n')
+                self.step_by_step["table"].append(f'{t}')
                 iterations = 0
                 # Keep pivoting until exception is raised or max iterations
                 while iterations < max_iterations:
                     t.pivot(use_blands_rule=use_blands_rule)
                     logging.info(
                     f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")  # Log pivots
-                    step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
+                    self.step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
                     logging.debug(f'{t}\n')  # Log tableau
-                    step_by_step['table'].append(f'{t}')
+                    self.step_by_step['table'].append(f'{t}')
                     iterations += 1
 
                 # Resort to Bland's rule if necessary
@@ -171,7 +175,7 @@ class SimplexSolver:
                 raise UnsolvableError(max_iterations)
 
         return Solution(state=t.state, basis=t.basis,
-                        solution=t.solution, obj_value=t.obj_value), step_by_step
+                        solution=t.solution, obj_value=t.obj_value), self.step_by_step
 
 
 
