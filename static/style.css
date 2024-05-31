@@ -29,8 +29,8 @@ h2 {
 .expression-container {
     display: flex;
     border: 1px solid #ccc;
-    width: 450px;
-    min-height: 45px;
+    min-width: 450px !important;
+    min-height: 45px !important;
     margin: 20px;
     flex-direction: column;
 }

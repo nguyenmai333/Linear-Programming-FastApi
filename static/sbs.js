@@ -29,25 +29,30 @@ function fetch_data() {
         .then(data => {
             const ExpressionList = data.expression_formatted.constraints;
             const numberOfVariables = countVariables(data.expression_formatted.expression_problem);
+
+            const problemElement = document.getElementById('problem');
+            const spanProblem = document.createElement('span');
+            spanProblem.innerText = `\\(${'Problem: ' + data['expression_formatted'].problem + '(' + data['expression_formatted'].expression_problem + ')'}\\)`;
+            problemElement.appendChild(spanProblem);
+            for (const property in ExpressionList) {
+                const formattedExpression = math_covert(ExpressionList[property]);
+                const spanFormattedExpression = document.createElement('li');
+                spanFormattedExpression.innerText = `\\(${formattedExpression}\\) `;
+                problemElement.appendChild(spanFormattedExpression);
+            }
+
+            MathJax.typeset(); 
+
             if (numberOfVariables == 2) {
-                const problemElement = document.getElementById('problem');
-                const spanProblem = document.createElement('span');
-                spanProblem.innerText = `\\(${'Problem: ' + data['expression_formatted'].problem + '(' + data['expression_formatted'].expression_problem + ')'}\\)`;
-                problemElement.appendChild(spanProblem);
-                
-                for (const property in ExpressionList) {
-                    const formattedExpression = math_covert(ExpressionList[property]);
-                    const spanFormattedExpression = document.createElement('li');
-                    spanFormattedExpression.innerText = `\\(${formattedExpression}\\) `;
-                    problemElement.appendChild(spanFormattedExpression);
-                }
-    
+
                 document.getElementById('outputVal').innerText = 'Optimal value: ' + data['graph_method'].val;
                 document.getElementById('outputVar').innerText = 'Coordinate: ('  + String(data['graph_method'].var[0]) +', ' + String(data['graph_method'].var[1]) + ')';
                 MathJax.typeset(); // Typeset MathJax content after updating
             } else {
                 document.getElementById('outputVar').textContent = '';
                 document.getElementById('outputVal').textContent = '';
+                document.getElementById('plotImage').remove();
+                document.getElementsByClassName('result')[0].innerHTML = 'Cannot solve problem with many variables';
             }
         })
         .catch(error => {
@@ -71,49 +76,63 @@ function createSimplexSolverTable() {
             jsonStep = data.simplex_solver.step_info;
 
             document.getElementById('outputVal2').innerText = 'Optimal value: ' + data['simplex_solver'].val;
-            document.getElementById('outputVar2').innerText = 'Coordinate: ('  + String(data['simplex_solver'].var[0]) +', ' + String(data['simplex_solver'].var[1]) + ')';
+            
+            let variables = data['simplex_solver'].var;
+            let output = 'Coordinate: (';
+            for (let i = 0; i < variables.length; i++) {
+                output += String(variables[i]);
+                if (i < variables.length - 1) {
+                    output += ', '; 
+                }
+            }
+
+            output += ')';
+            document.getElementById('outputVar2').innerText = output;
+
             
             let step_cnt = 0;
             let limited_length = jsonData.length;
             jsonData.forEach( (e) => {
                 jsonData = JSON.parse(e);
                 const jsonTable = document.createElement('table');
-                jsonTable.id = 'jsonTable';
+                if (jsonData.header.length !== 0 && jsonData.rows.length !== 0) {
+                    jsonTable.id = 'jsonTable';
                 
-                const ele_thead = document.createElement('thead');
-                ele_thead.setAttribute('id', 'tableHead');
-                const ele_tbody = document.createElement('tbody');
-                ele_tbody.setAttribute('id', 'tableBody');
-                jsonTable.appendChild(ele_thead);
-                jsonTable.appendChild(ele_tbody);
-                
-                // Creating the header row
-                const tableHeaderRow = document.createElement("tr");
-                tableHeaderRow.appendChild(document.createElement("th"));
-                jsonData.header.forEach(header => {
-                    const th = document.createElement("th");
-                    th.textContent = header;
-                    tableHeaderRow.appendChild(th);
-                });
-                
-                ele_thead.appendChild(tableHeaderRow);
-                // Creating the body rows
-                jsonData.rows.forEach(row => {
-                    const tr = document.createElement("tr");
+                    const ele_thead = document.createElement('thead');
+                    ele_thead.setAttribute('id', 'tableHead');
+                    const ele_tbody = document.createElement('tbody');
+                    ele_tbody.setAttribute('id', 'tableBody');
+                    jsonTable.appendChild(ele_thead);
+                    jsonTable.appendChild(ele_tbody);
                     
-                    const tdName = document.createElement("td");
-                    tdName.textContent = row.name;
-                    tr.appendChild(tdName);
-                    
-                    row.values.forEach(value => {
-                        const tdValue = document.createElement("td");
-                        tdValue.textContent = value;
-                        tr.appendChild(tdValue);
+                    // Creating the header row
+                    const tableHeaderRow = document.createElement("tr");
+                    tableHeaderRow.appendChild(document.createElement("th"));
+                    jsonData.header.forEach(header => {
+                        const th = document.createElement("th");
+                        th.textContent = header;
+                        tableHeaderRow.appendChild(th);
                     });
                     
-                    ele_tbody.appendChild(tr);
-                });
-                document.getElementsByClassName('content')[1].appendChild(jsonTable);
+                    ele_thead.appendChild(tableHeaderRow);
+                    // Creating the body rows
+                    jsonData.rows.forEach(row => {
+                        const tr = document.createElement("tr");
+                        
+                        const tdName = document.createElement("td");
+                        tdName.textContent = row.name;
+                        tr.appendChild(tdName);
+                        
+                        row.values.forEach(value => {
+                            const tdValue = document.createElement("td");
+                            tdValue.textContent = value;
+                            tr.appendChild(tdValue);
+                        });
+                        
+                        ele_tbody.appendChild(tr);
+                    });
+                    document.getElementsByClassName('content')[1].appendChild(jsonTable);
+                }
                 if (step_cnt < limited_length - 1) {
                     const step_info = document.createElement('div');
                     step_info.setAttribute('style','margin-left: 5%; margin-bottom: 1%;');

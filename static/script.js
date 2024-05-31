@@ -114,11 +114,11 @@ function confirmExpression() {
             })
             .then(response => response.json())
             .then(data => {
-                const endpoint = '/solve';
-                const hostname = window.location.hostname;
-                const port = window.location.port;
-                const newUrl = `http://${hostname}:${port}${endpoint}`;
-                window.location.href = newUrl;
+                // const endpoint = '/solve';
+                // const hostname = window.location.hostname;
+                // const port = window.location.port;
+                // const newUrl = `http://${hostname}:${port}${endpoint}`;
+                // window.location.href = newUrl;
             })
             .catch((e) => {
                 console.error('error:', e);

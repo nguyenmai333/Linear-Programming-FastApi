@@ -7,6 +7,7 @@ import numpy as np
 import io
 import contextlib
 import logging
+import copy
 
 from .exceptions import InfeasibleProblem
 from .exceptions import ReachedOptimality
@@ -142,6 +143,9 @@ class Tableau:
             # if it is another exception, let it be raised
             return False
         return True
+
+    def copy(self):
+        return copy.deepcopy(self)
 
     @property
     def obj_value(self) -> float:

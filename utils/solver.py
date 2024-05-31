@@ -152,9 +152,11 @@ class SimplexSolver:
                 raise UnsolvableError(max_iterations)
                 
                 
-            else:                
+            else:
+                original_table = t.copy()                
                 logging.debug(f'{t}\n')
-                self.step_by_step["table"].append(f'{t}')
+                if use_blands_rule == False:
+                    self.step_by_step["table"].append(f'{t}')
                 iterations = 0
                 # Keep pivoting until exception is raised or max iterations
                 while iterations < max_iterations:
@@ -164,11 +166,16 @@ class SimplexSolver:
                     self.step_by_step['step_info'].append(f" Departing_Row: {t.pivot_idx[0]}, Entering_Col: {t.pivot_idx[1]}")
                     logging.debug(f'{t}\n')  # Log tableau
                     self.step_by_step['table'].append(f'{t}')
+
+                    if np.array_equal(t.tab, original_table.tab):
+                        break
                     iterations += 1
 
                 # Resort to Bland's rule if necessary
                 if not use_blands_rule:
                     logging.info("Possible Cycling detected. Resorting to Bland's Rule.")
+                    self.step_by_step["step_info"].append('Possible Cycling detected. Resorting to Blands Rule.')
+                    self.step_by_step['table'].append(f'{t}')
                     return self.solve(use_blands_rule=True)
 
                 # If no solution is found

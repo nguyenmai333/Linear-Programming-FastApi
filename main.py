@@ -142,10 +142,11 @@ async def calculate_expression(data: dict):
     global image_stream
     try:
         json_loader = json.loads(data['json_expression'])
-        res = graph_method(json_loader)
+        if len(json_loader['objective']['coefficients']) == 2:
+            res = graph_method(json_loader)
+            stored_result['graph_method'] = res
+            image_stream = graph_generator(json_loader)
         simplex_solver_res = simplexSolver(json_loader)
-        image_stream = graph_generator(json_loader)
-        stored_result['graph_method'] = res
         stored_result['simplex_solver'], stored_result['simplex_solver']['val'], stored_result['simplex_solver']['var'] = simplex_solver_res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
